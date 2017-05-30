@@ -1,0 +1,380 @@
+import java.util.*;
+public class KepasQuest {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int x = 2;
+        int y = 1;
+        int loop = 1;
+        int masterKey = 1;
+        int kepasInRoom = 1;
+        int lunchSeen = 0;
+        int door = 1;
+        int door2 = 1;
+        int notepad = 1;
+        int gameWon = 0;
+        String act = "";
+        String place = "";
+
+//item stores the description of potential items within the rooms
+        String[][] item = new String[12][6];
+        item[1][4] = "You see what you believe to be is the master key conveniently unguarded on a desk";
+        item[1][3] = "There appears to be an intercom on one of the desks that you can use";
+        item[3][3] = "There is a notepad on the wall with the underlined words ‘Kepas Password’, it might serve as some kind of hint.";
+        item[8][3] = "Sitting at the desk is your teacher, Mr. Kepas, chugging down bottles of his favorite drink. You can’t make out what the label reads and you’re too afraid to go talk to him";
+        item[6][1] = " there is a sign saying ‘free doughnuts for teachers’ but it doesn’t seem like any of the teachers have actually acknowledged this";
+        item[2][1] = "";
+        item[2][2] = "";
+        item[2][3] = "";
+        item[3][1] = "";
+        item[4][1] = "";
+        item[5][1] = "";
+        item[5][2] = "";
+        item[9][1] = "";
+        item[9][2] = "";
+        item[9][3] = "";
+        item[8][2] = "";
+
+        //Location stores the location's name
+        String[][] location = new String[12][6];
+        location[0][3] = "wall";
+        location[0][4] = "wall";
+        location[1][2] = "wall";
+        location[1][5] = "wall";
+        location[3][0] = "wall";
+        location[3][2] = "wall";
+        location[3][4] = "wall";
+        location[4][0] = "wall";
+        location[4][3] = "wall";
+        location[5][0] = "wall";
+        location[6][0] = "wall";
+        location[7][1] = "wall";
+        location[6][2] = "wall";
+        location[10][1] = "wall";
+        location[10][3] = "wall";
+        location[11][2] = "wall";
+        location[7][2] = "wall";
+        location[7][3] = "wall";
+        location[8][4] = "wall";
+        location[2][0] = "unwanted";
+        location[1][1] = "unwanted";
+        location[2][4] = "unwanted";
+        location[5][3] = "unwanted";
+        location[9][0] = "unwanted";
+        location[9][4] = "unwanted";
+
+
+        location[2][1] = "-Entrance Hall-" + "\n" + "You are at the front of the building, the only places of interest appear to be the hallway leading east, and the hallway leading north";
+        location[2][2] = "-Administrative Hall 1-" + "\n" + "You are in the middle of a hallway, You can see the Janitor's closet and the principal's office further down the hall";
+        location[2][3] = "-Administrative Hall 2-" + "\n" + "You are further up the Administrative Hall, to the north there is the janitor's closet, to the south there is the administrator's office, continuing down the hall seems pointless to you";
+        location[3][3] = "-Janitor's Closet-" + "\n" + "You entered the Janitor's closet with the use of your master key, it reeks of cleaning supplies, but if gaming has taught you anything, the fact you can enter this room means there's something of value";
+        location[1][3] = "-Administrator's Room-" + "\n" + "You’ve entered the Administrator's office which conveniently appears to be empty. There's a door to the east that seems to be leading into the principal's office";
+        location[1][4] = "-Principal's Office-" + "\n" + "You’ve entered the principal's office, which thankfully, is also empty.";
+        location[3][1] = "-Central Hallway 1-" + "\n" + "You are at the at the south end of the central hallway, you see vending machines and the lunchroom up ahead";
+        location[4][1] = "-Central Hallway 2-" + "\n" + "You are in the middle of the central hallway, you see vending machines and the lunchroom to the north";
+        location[5][1] = "-Central Hallway 3-" + "\n" + "You are at the north end of the central hallway, north of you is the cafeteria and right next to you are the vending machines";
+        location[6][1] = "-Cafeteria-" + "\n" + "You are in the cafeteria, to the south there is the hallway that you entered from.";
+        location[5][2] = "-Uninteresting Hallway-" + "\n" + "You are in a hallway that doesn’t seem particularly interesting, to the south of you there is a set of stairs to the next floor";
+        location[9][1] = "-Upstairs Hallway 1-" + "\n" + "You’re on the second floor now, to the south you see the staircase you climbed up to get upstairs, to the east, you see a hallway with a room that may be of some significance, and your teachers classroom farther down";
+        location[9][2] = "-Upstairs Hallway 2-" + "\n" + "You’re on the second floor, to the west you see the staircase to go back downstairs, to the south you see a room that may be of some significance, and your teachers classroom farther down the hall to the east";
+        location[9][3] = "-Upstairs Hallway 3-" + "\n" + "You’re on the second floor, to the west you see a room that may be of some significance, and your teachers classroom is right next to you to the south";
+        location[8][2] = "-Locked Room-" + "\n" + "You are now in the room that you noted was previously locked, you expected to find a convenient hint here but all that stands out to you is the boatloads of 2LiterDietCoke bottles filling the room";
+        location[8][3] = "-Kepas’ Room-" + "\n" + "You are now in the room you know all too well, you recognize the seat you’re normally in but the only seat you’re interested in is the one giving you access to skyward";
+        location[10][2] = "-Bathroom-" + "\n" + "You’ve entered the men's restroom, what do you need to go or something? Hurry up then, we don’t have all day, one of us has a life outside this game";
+
+
+        //move stores verb actions that moves the player
+        List<String> move = new ArrayList<String>();
+        List<String> action = new ArrayList<String>();
+        List<String> use = new ArrayList<String>();
+        List<String> body = new ArrayList<String>();
+        List<String> fun = new ArrayList<String>();
+
+        List<String> invent = new ArrayList<String>();
+
+        //directions that hold many words with similar definition to move
+        List<String> north = new ArrayList<String>();
+        List<String> south = new ArrayList<String>();
+        List<String> east = new ArrayList<String>();
+        List<String> west = new ArrayList<String>();
+
+        fun.add("yoga");
+        fun.add("moonwalk");
+        fun.add("yell");
+        fun.add("dance");
+
+        body.add("hands");
+        body.add("hand");
+        body.add("foot");
+        body.add("feet");
+        body.add("mouth");
+
+
+
+        east.add("east");
+        east.add("e");
+        east.add("right");
+
+        west.add("west");
+        west.add("w");
+        west.add("left");
+
+        south.add("south");
+        south.add("s");
+        south.add("downward");
+
+        north.add("north");
+        north.add("n");
+        north.add("forward");
+
+        move.add("go");
+        move.add("move");
+        move.add("walk");
+        move.add("run");
+        move.add("travel");
+
+        use.add("use");
+        use.add("deploy");
+        use.add("hold");
+
+        action.add("take");
+        action.add("pick");
+        action.add("pickup");
+        action.add("obtain");
+        action.add("grab");
+
+
+        System.out.println("DOS BOOTUP SHELL V.43" + "\n" + "3300 CYCLES   0 FRAMESKIP STATUS ::: OK" + "\n" + "Z:\\SET BLASTER-A2202 I3" + "\n" + "STATUS ::: ONLINE");
+
+        System.out.println("C:\\>_");
+        System.out.print("Begin Kepas Quest |y/n| ");
+        String begin = in.nextLine();
+        if (begin.contains("y") == true) {
+            System.out.println("You are a student in Mr. Kepas’ Programming 2 class" + "\n" +
+                    "Recently your grades seem to be out of control, so you decide you need to take actions into your own hands" + "\n" + "Find out Kepas’ password, infiltrate his room, get him out of his room, and change your grades without getting caught");
+            System.out.println("");
+
+            loop = 0;
+        } else {
+            System.out.println("Shutting down.");
+        }
+
+
+        while (loop == 0) {
+            System.out.println(location[x][y] + "\n" + item[x][y] + "\n");
+            System.out.print("Action: ");
+            act = in.nextLine();
+            System.out.println("");
+//---------------------------------<If the option was “Move”>----------------------------------
+            if (move.contains(act) == true) {
+                System.out.print("Direction: ");
+                place = in.nextLine();
+                System.out.println("");
+//----------------------------------<North>------------------------------------------------------------
+                if (north.contains(place) == true) {
+                    if (location[x + 1][y] == "wall") {
+                        System.out.println("You became acquainted with the wall.");
+                    } else if (location[x + 1][y] == "unwanted") {
+                        System.out.println("Although intriguing, you don’t think that going there would be very helpful in your quest");
+                    } else if (location[x + 1][y] == location[3][3] && door == 1) {
+                        System.out.println("The door is locked, if only you had a key");
+                    } else if (location[x + 1][y] == location[6][1]) {
+                        x++;
+                        lunchSeen = 1;
+                    } else {
+                        x++;
+                    }
+                }
+
+//-----------------------------<South>------------------------------------------------------------------
+                else if (south.contains(place) == true) {
+                    if (location[x - 1][y] == "wall") {
+                        System.out.println("You became acquainted with the wall.");
+                    } else if (location[x - 1][y] == "unwanted") {
+                        System.out.println("Although intriguing, you don’t think that going there would be very helpful in your quest");
+                    } else if (location[x][y] == location[5][2]) {
+                        x = 9;
+                        y = 1;
+                    } else if (location[x][y] == location[9][1]) {
+                        x = 5;
+                        y = 2;
+                    } else if (location[x - 1][y] == location[9][2] && door2 == 1) {
+                        System.out.println("The door is locked, if only you had a key");
+                    } else {
+                        x--;
+                    }
+                    ;
+
+                }
+
+//----------------------------<East>--------------------------------------------------------------------------
+                else if (east.contains(place) == true) {
+                    if (location[x][y + 1] == "wall") {
+                        System.out.println("You became acquainted with the wall.");
+
+                    } else if (location[x][y + 1] == "unwanted") {
+                        System.out.println("Although intriguing, you don’t think that going there would be very helpful in your quest");
+                    } else if (location[x][y] == location[8][2]) {
+                        System.out.println("You became acquainted with the wall.");
+                    } else if (location[x][y] == location[4][1]) {
+                        System.out.println("You became acquainted with the wall.");
+                    } else {
+                        y++;
+                    }
+                    ;
+                }
+//--------------------------<West>------------------------------------------------------------------------------
+                else if (west.contains(place) == true) {
+                    if (location[x][y - 1] == "wall") {
+                        System.out.println("You became acquainted with the wall.");
+
+                    } else if (location[x][y - 1] == "unwanted") {
+                        System.out.println("Although intriguing, you don’t think that going there would be very helpful in your quest");
+                    } else if (location[x][y] == location[8][2]) {
+                        System.out.println("You became acquainted with the wall.");
+                    } else {
+                        y--;
+                    }
+                    ;
+                } else {
+                    System.out.println("Sorry, I couldn’t understand that. Please speak clearly.");
+                }
+            }
+//----------------------------------------------------------------------------------------------
+
+//                   else if (act.contains("drink") && x == 6){
+//                      if (???){
+//                         System.out.println("Thank you, I was getting quite thirsty from
+//narrating.");
+//                      }
+//                   }
+
+//----------------<If the option is “Use”>-------------------------------------------
+            else if (use.contains(act) == true) {
+//------------------<Checks the item they choose to use>-------------
+                System.out.println("Use: ");
+                String deploy = in.nextLine();
+                System.out.println("");
+//-----------------------------<Checks the target>------------------------------------
+                if (invent.contains(deploy) == true) {
+                    System.out.print("On: ");
+                    String target = in.nextLine();
+                    System.out.println("");
+                    if (target.contains("door") == true && x == 2 && y == 3 && deploy.contains("key")) {
+                        System.out.println("You unlocked the door");
+                        door = 0;
+                    } else if (target.contains("door") == true && x == 9 && y == 2 && deploy.contains("key")) {
+                        System.out.println("You unlocked the door");
+                        door2 = 0;
+                    }
+
+//------------------<If user chooses to use the intercom>-----------------------
+                } else if (deploy.contains("intercom") == true && x == 1 && y == 3) {
+                    System.out.println("Say:");
+                    String say = in.nextLine();
+                    System.out.println("");
+                    if (say.contains("doughnuts in the lunchroom")) {
+                        System.out.println("Now that Kepas is distracted, you can go change you grade!");
+                        item[8][3] = "It seems that Kepas is gone now so you can now access his computer." + "\n" + "he didn’t leave it unlocked sadly, so you’ll need to guess his password";
+                        kepasInRoom = 0;
+                        item[5][1] = "You see Kepas devouring the doughnuts in the lunchroom as fast as he can. " + "\n" + "Quickly! Go change your grade!";
+                    } else if (lunchSeen == 1) {
+                        System.out.println("This is no time for your needless jokes" + "\n" + "Maybe the doughnuts in the lunchroom would be a good way to distract Kepas");
+                    } else {
+                        System.out.println("This is no time for your needless jokes");
+                    }
+//----------------<If user chooses to use the Computer>----------------------------
+                } else if (deploy.contains("computer") == true && x == 8 && y == 3) {
+                    if (kepasInRoom == 0) {
+                        System.out.println("Failure to guess the password will result in a game over." + "/n" + "Are you sure? |y/n|");
+                        String choice = in.nextLine();
+                        System.out.println("");
+                        if (choice.contains("y")) {
+                            System.out.println("From the looks of things you’ll have 3 tries, good luck");
+                            for (int i = 0; i < 3; i++) {
+                                System.out.println("Input password:");
+                                String guess = in.nextLine();
+                                if (guess.contains("2LiterDietCoke")) {
+                                    System.out.println("Congratulations!!!" + "\n" + "Grade successfully updated");
+                                    gameWon = 1;
+                                    loop = 1;
+                                    break;
+                                } else {
+                                    System.out.println("Incorrect");
+                                }
+                            }
+                            if(gameWon == 0){
+                                System.out.println("3 incorrect attempts made" + "\n" + "Shutdown initiated” +”\n” +”Administrator notified");
+                                loop = 1;
+                            }
+                        } else if (choice.contains("n")) {
+                            System.out.println("Hurry and find out the password, Kepas won’t be there all day.");
+                        } else {
+                            System.out.println("I’ll take that as a no");
+                        }
+                    } else {
+                        System.out.println("While he’s still at his desk?! You’ve got some balls kid, but if you care about your grade enough to cheat, you’re not gonna openly cheat in front of him");
+                    }//else statement
+
+
+//-----------------<If user chooses to use their body>-------------------------------------
+                } else if (body.contains(deploy) == true) {
+                    System.out.println("You’re body is too frail to use for anything" + "\n" + "you signed up for a programming class, remember?.");
+                } else {
+                    System.out.println("An old man's words echos through your head" + "\n" + "‘Now is not the time and place to use that’" + "\n" + "You think you might be going crazy");
+                }
+            }
+//---------------------------------<if input is to check>-------------------------------------------------------------
+            else if (act.contains("check") == true) {
+                System.out.println("Inventory: " + invent);
+            }
+//-----------------<If input is to grab at something>---------------------------------------
+            else if (action.contains(act) == true) {
+                System.out.print("Obtain: ");
+                String obtain = in.nextLine();
+                System.out.println("");
+                if (obtain.contains("key") == true && masterKey == 1 && x == 1 && y == 4) {
+                    System.out.println("You took the key off the principal's desk, it's too convenient not to pass up");
+                    invent.add("key");
+                    masterKey = 0;
+                    item[1][4] = "";
+                } else if (obtain.contains("note") == true && notepad == 1 && x == 3 && y == 3) {
+                    System.out.println("You grabbed the notepad");
+                    invent.add("notepad");
+                    notepad = 0;
+                    item[3][3] = "";
+                } else {
+                    System.out.println("At a second glance, you notice that thing isn't here.");
+                }
+            }
+//----------------------------------------------------------------------------------------------
+            else if (fun.contains(act) == true) {
+                System.out.println("Every second you waste looking like an idiot is another second you could be changing your grade");
+            }
+//----------------------------------------------------------------------------------------------
+            else if (act.contains("read") == true) {
+                System.out.print("On: ");
+                String read = in.nextLine();
+                System.out.println("");
+                if (read.contains("key") == true && invent.contains("key") == true) {
+                    System.out.println("It’s the master key that you swiped off the principal's desk" + "\n" + "With this, there's no door locked door you can’t open");
+                } else if (read.contains("notepad") == true && invent.contains("notepad") == true) {
+                    System.out.println("It’s the hint you took from the Janitor's closet" + "\n" + "its slightly faded but you can at least make out '_L_ _ _ _D_ _ _C_ _ _'");
+                } else {
+                    System.out.println("That is item is not in your inventory.");
+                }
+            }
+//----------------------------------------------------------------------------------------------
+            else {
+                System.out.println("You’re either stupid or the person who coded this is,try something else");
+            }
+            System.out.println("-------------------------------------------------------------------------");
+
+        }
+        if (gameWon == 1) {
+            System.out.println("YOU WIN!!!");
+        } else {
+            System.out.println("GAME OVER");
+        }
+        System.out.println("Thank you for playing Kepas Quest");
+    }
+}
